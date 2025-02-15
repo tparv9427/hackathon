@@ -1,5 +1,5 @@
 import connectDB from '../../lib/db';
-import ThreatLog from '../../models/ThreatLog';
+import ThreatLog from '../../models/Threat';
 
 export default async function handler(req, res) {
     if (req.method !== "GET") {

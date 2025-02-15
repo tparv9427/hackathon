@@ -1,4 +1,4 @@
-analyze.jsimport Groq from 'groq-sdk';
+import Groq from 'groq-sdk';
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
